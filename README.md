@@ -1,1 +1,1 @@
-# Programowanie-aplikacji
+# Podstawy programowania aplikacji
