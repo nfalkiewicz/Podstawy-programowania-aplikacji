@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="instruction" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.hangman.NewDB">
+   <children>
+      <Label layoutX="207.0" layoutY="40.0" text="Instrukcja">
+         <font>
+            <Font size="44.0" />
+         </font>
+      </Label>
+      <VBox layoutX="13.0" layoutY="140.0" prefHeight="114.0" prefWidth="579.0">
+         <children>
+            <Label prefHeight="18.0" prefWidth="508.0" text="Witaj, kandydacie na Wisielca!">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label prefHeight="20.0" prefWidth="541.0" text="Twoim zadaniem jest zgadnąć jakie słowo zostało wylosowane z bazy słów wszelakich.">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label prefHeight="18.0" prefWidth="500.0" text="Możesz zgadnąć pojedynczą literę poprzez wpisanie jej w odpowiednie pole.">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label prefHeight="20.0" prefWidth="535.0" text="Uważaj! Masz ograniczoną liczbę żyć. Litera, której nie ma w słowie to utrata życia.">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label prefHeight="20.0" prefWidth="561.0" text="Na stronie głównej możesz edytować bazę słów - dodać nowe, usunąć już istniejące.">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label prefHeight="18.0" prefWidth="500.0" text="Miłej zabawy!">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+      <Button fx:id="returnButton" layoutX="219.0" layoutY="327.0" mnemonicParsing="false" text="Wróć do strony głównej">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>
