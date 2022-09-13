@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class DbManager {
     private Connection connection;
@@ -68,6 +69,20 @@ public class DbManager {
         obtainConnection();
     }
 
+    public ArrayList<Word> getWords(Connection c) throws SQLException{
+        ArrayList<Word> wordList = new ArrayList<>();
+        String SQL = "SELECT * from WORDS";
+        ResultSet rs = c.createStatement().executeQuery(SQL);
+        while (rs.next()) {
+            //Iterate Row
+            Word temp = new Word(rs.getInt(1), rs.getString(2),
+                    rs.getString(3), rs.getString(4));
+            /*System.out.println("Row [1] added "+ temp);*/
+            wordList.add(temp);
+        }
+        return wordList;
+
+    }
     public Word insertWord(Connection c, String name, String category) throws SQLException {
         String length = String.valueOf(name.length());
         try (PreparedStatement st = c.prepareStatement("INSERT INTO WORDS (SłOWO, DŁUGOŚĆ, KATEGORIA) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {

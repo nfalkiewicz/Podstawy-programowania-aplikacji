@@ -1,7 +1,4 @@
 package com.example.hangman;
-/*
-Niestety póki co działa wszystko poza mechanizmem gry, ale pracuję nad tym.
- */
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -32,6 +29,9 @@ public class Hangman extends Application {
     ObservableList<Word> data = FXCollections.observableArrayList();
     TableView<Word> table = new TableView<Word>();
 
+    Label guessSmallLabel, wordLabel, livesLabel, showWordLabel, showLivesLabel;
+    Label guessBigLabel;
+
 
     private DbManager dbManager;
 
@@ -39,9 +39,15 @@ public class Hangman extends Application {
         return dbManager;
     }
 
-    private void start() {
+    private void start() throws SQLException {
         this.dbManager = new DbManager();
         this.dbManager.prepareDbIfNeeded();
+        data.add(this.dbManager.insertWord(this.dbManager.getConnection(), "mama",
+               "rodzina"));
+        data.add(this.dbManager.insertWord(this.dbManager.getConnection(), "kot",
+                "zwierzę"));
+        data.add(this.dbManager.insertWord(this.dbManager.getConnection(), "ołówek",
+                "przedmiot"));
     }
 
     private Button creatButton(String name){
@@ -84,12 +90,15 @@ public class Hangman extends Application {
         return temp;
     }
 
-    private void beginGame(){
-        System.out.println("Nie wiem jak.");
+    private Label creatWordLabel(String text){
+        Label label = creatGameLabel(text);
+        label.setFont(new Font("System", 30));
+        label.setPrefSize(300, 30);
+        return label;
     }
 
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) throws IOException, SQLException {
         // Prepares data base
         start();
 
@@ -110,9 +119,9 @@ public class Hangman extends Application {
         mainButtons.setAlignment(Pos.CENTER);
 
         Button gameButton, instructionButton, editDBButton, endButton;
+        Game gameSetup = new Game();
 
         gameButton = creatButton("Start!");
-        gameButton.setOnAction(e -> {beginGame();stage.setScene(game);});
 
         instructionButton = creatButton("Instrukcja");
         instructionButton.setOnAction(e -> stage.setScene(instruction));
@@ -136,19 +145,33 @@ public class Hangman extends Application {
 
         // Labels
 
-        Label guessBigLabel;
+        gameButton.setOnAction(e -> {
+            try {
+                gameSetup.setWordList(dbManager.getWords(dbManager.getConnection()));
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            gameSetup.setLivesNumber(5);
+            //System.out.println((gameSetup.getHiddenWord()+ gameSetup.getName()));
+            showWordLabel.setText(gameSetup.getHiddenWord());
+            showLivesLabel.setText(gameSetup.getLives());
+            stage.setScene(game);
+        });
+
+        //Label guessBigLabel;
         guessBigLabel = creatBigLabel("Zgadnij słowo");
         guessBigLabel.setLayoutX(250);
 
-        Label guessSmallLabel, wordLabel, livesLabel, showWordLabel, showLivesLabel;
+        //Label guessSmallLabel, wordLabel, livesLabel, showWordLabel, showLivesLabel;
         guessSmallLabel = creatGameLabel("Zgadnij literę");
         wordLabel = creatGameLabel("Słowo");
         livesLabel = creatGameLabel("Życia");
-        showWordLabel = creatGameLabel("Tu się pokaże słowo");
-        showWordLabel.setFont(new Font("System", 30));
-        showWordLabel.setPrefSize(300, 30);
-        showLivesLabel = creatGameLabel("*****");
+        //showWordLabel = creatGameLabel(gameSetup.getHiddenWord());
+        //showWordLabel.setFont(new Font("System", 30));
+        //showWordLabel.setPrefSize(300, 30);
+        showLivesLabel = creatGameLabel("");
         showLivesLabel.setFont(new Font("System", 30));
+        showWordLabel = creatWordLabel("");
 
         // Boxes
 
@@ -172,6 +195,15 @@ public class Hangman extends Application {
         guessText.setPrefSize(170, 30);
         guessText.setFont(new Font("System", 17));
         Button guessButton = creatButton("Zgaduję!");
+        guessButton.setOnAction(e -> {
+            if (gameSetup.getLose() == false && gameSetup.getWin() == false){
+                gameSetup.setLetter(guessText.getText());
+                guessText.clear();
+                showWordLabel.setText(gameSetup.getHiddenWord());
+                showLivesLabel.setText(gameSetup.getLives());
+            }
+        }
+        );
 
         guessHB.getChildren().addAll(guessText, guessButton);
         guessVB.getChildren().addAll(guessSmallLabel, guessHB);
@@ -187,9 +219,12 @@ public class Hangman extends Application {
 
         Button newWordButton, returnButton;
 
-        //TODO newWordButton
         newWordButton = creatButton("Nowe słowo");
-        newWordButton.setOnAction(e -> System.out.println("Nie mam słów"));
+        newWordButton.setOnAction(e -> {
+            gameSetup.randomWord();
+            showWordLabel.setText(gameSetup.getHiddenWord());
+            showLivesLabel.setText(gameSetup.getLives());
+        });
 
         returnButton = creatButton("Wróć do menu");
         returnButton.setOnAction(e -> stage.setScene(main));
@@ -232,7 +267,6 @@ public class Hangman extends Application {
 
         instruction = new Scene(instructionPane, sceneV, sceneH);
 
-        //TODO EditDBScene
         /*
             Edit DB Scene
          */
@@ -348,7 +382,6 @@ public class Hangman extends Application {
 
         table.getColumns().addAll(idCol, wordCol, lenCol, categoryCol);
 
-        // TODO Button functions
 
         addButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -356,7 +389,6 @@ public class Hangman extends Application {
                 try {
                     data.add(dbManager.insertWord(dbManager.getConnection(), addWordTF.getText(),
                             addCategoryTF.getText()));
-                    System.out.println("TU doszedłem");
                     addWordTF.clear();
                     addCategoryTF.clear();
                     table.setItems(data);
